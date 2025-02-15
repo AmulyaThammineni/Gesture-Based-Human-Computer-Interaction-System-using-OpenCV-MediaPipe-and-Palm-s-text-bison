@@ -24,6 +24,11 @@ GESTURES = {
     "open_hand": "Open Hand (Scroll) 🖐️",
     "pointing": "Pointing (Highlight) ☝️",
     "fist": "Fist (Select)",
+    "peace_sign": "Peace Sign",
+    "okay_sign": "Okay Sign",
+    "palm_down": "Palm Down",
+    "rock_on": "Rock On",
+
     "unknown": "Unknown Gesture ❓"
 }
 
@@ -88,6 +93,34 @@ def classify_gesture(landmarks):
         pinky_tip.y > landmarks[17].y
     ):
         return "fist"
+     # Peace Sign (index and middle fingers up)
+    elif (
+        index_tip.y < landmarks[6].y
+        and middle_tip.y < landmarks[10].y
+        and thumb_tip.y > landmarks[2].y
+    ):
+        return "peace_sign"
+    
+    # Okay Sign (thumb and index form a circle)
+    elif (
+        abs(thumb_tip.x - index_tip.x) < 0.05
+        and abs(thumb_tip.y - index_tip.y) < 0.05
+    ):
+        return "okay_sign"
+    
+    # Palm Down
+    elif thumb_tip.y < index_tip.y and middle_tip.y < index_tip.y and ring_tip.y < index_tip.y:
+        return "palm_down"
+    
+    # Rock On (index and pinky up, other fingers curled)
+    elif (
+        index_tip.y < landmarks[5].y
+        and pinky_tip.y < landmarks[17].y
+        and middle_tip.y > landmarks[9].y
+        and ring_tip.y > landmarks[13].y
+    ):
+        return "rock_on"
+
 
     return "unknown"
 
