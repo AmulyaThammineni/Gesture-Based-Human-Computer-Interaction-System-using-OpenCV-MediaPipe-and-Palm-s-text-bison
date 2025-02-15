@@ -14,22 +14,15 @@ hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7
 
 # Gesture Dictionary
 GESTURES = {
-    "thumbs_up": "Thumbs Up 👍",
-    "thumbs_down": "Thumbs Down 👎",
-    "hi": "Hi (Waving) 👋",
-    "good": "Good (Thumbs Up with Bent Wrist)",
-    "bad": "Bad (Thumbs Down with Bent Wrist)",
-    "click": "Click (Index & Thumb Touching) 🖱️",
-    "select": "Select (Fist with Index Finger Extended) ✋",
-    "open_hand": "Open Hand (Scroll) 🖐️",
-    "pointing": "Pointing (Highlight) ☝️",
+    "thumbs_up": "Thumbs Up",
     "fist": "Fist (Select)",
+    "open_hand": "Open Hand (Scroll)",
+    "pointing": "Pointing (Highlight)",
     "peace_sign": "Peace Sign",
     "okay_sign": "Okay Sign",
     "palm_down": "Palm Down",
     "rock_on": "Rock On",
-
-    "unknown": "Unknown Gesture ❓"
+    "unknown": "Unknown Gesture"
 }
 
 # Function to classify hand gestures
@@ -39,61 +32,33 @@ def classify_gesture(landmarks):
     middle_tip = landmarks[12]
     ring_tip = landmarks[16]
     pinky_tip = landmarks[20]
-
-    # Thumb Up
+    
+    # Thumb up
     if thumb_tip.y < index_tip.y and thumb_tip.y < middle_tip.y:
         return "thumbs_up"
     
-    # Thumb Down
-    elif thumb_tip.y > index_tip.y and thumb_tip.y > middle_tip.y:
-        return "thumbs_down"
-
-    # Waving Hand (Hi)
+    # Fist
     elif (
-        index_tip.y < middle_tip.y < ring_tip.y < pinky_tip.y and
-        abs(index_tip.x - pinky_tip.x) > 0.1  # Hand spread wide
-    ):
-        return "hi"
-
-    # Good - Thumbs Up but wrist bent
-    elif thumb_tip.y < index_tip.y and abs(thumb_tip.x - index_tip.x) > 0.05:
-        return "good"
-
-    # Bad - Thumbs Down but wrist bent
-    elif thumb_tip.y > index_tip.y and abs(thumb_tip.x - index_tip.x) > 0.05:
-        return "bad"
-
-    # Click - Index and Thumb Touching
-    elif abs(index_tip.x - thumb_tip.x) < 0.02 and abs(index_tip.y - thumb_tip.y) < 0.02:
-        return "click"
-
-    # Select - Fist but index finger extended
-    elif (
-        index_tip.y < middle_tip.y and
-        middle_tip.y > ring_tip.y and ring_tip.y > pinky_tip.y
-    ):
-        return "select"
-
-    # Open Hand
-    elif (
-        index_tip.y < middle_tip.y < ring_tip.y < pinky_tip.y and
-        abs(index_tip.x - pinky_tip.x) > 0.05
-    ):
-        return "open_hand"
-
-    # Pointing - Index Finger Extended
-    elif index_tip.x < thumb_tip.x and middle_tip.y > ring_tip.y:
-        return "pointing"
-
-    # Fist - All fingers curled
-    elif (
-        index_tip.y > landmarks[5].y and
-        middle_tip.y > landmarks[9].y and
-        ring_tip.y > landmarks[13].y and
-        pinky_tip.y > landmarks[17].y
+        index_tip.y > landmarks[5].y
+        and middle_tip.y > landmarks[9].y
+        and ring_tip.y > landmarks[13].y
+        and pinky_tip.y > landmarks[17].y
     ):
         return "fist"
-     # Peace Sign (index and middle fingers up)
+    
+    # Open hand
+    elif (
+        index_tip.y < middle_tip.y
+        and middle_tip.y < ring_tip.y
+        and ring_tip.y < pinky_tip.y
+    ):
+        return "open_hand"
+    
+    # Pointing
+    elif index_tip.x < thumb_tip.x and middle_tip.y > ring_tip.y:
+        return "pointing"
+    
+    # Peace Sign (index and middle fingers up)
     elif (
         index_tip.y < landmarks[6].y
         and middle_tip.y < landmarks[10].y
@@ -120,9 +85,9 @@ def classify_gesture(landmarks):
         and ring_tip.y > landmarks[13].y
     ):
         return "rock_on"
-
-
-    return "unknown"
+    
+    else:
+        return "unknown"
 
 # Function to get AI description from Palm
 def get_ai_description(gesture_name):
